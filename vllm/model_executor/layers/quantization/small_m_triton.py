@@ -152,7 +152,7 @@ class SmallMTRITONLinearMethod(LinearMethodBase):
     ) -> torch.Tensor:
         # Scale input and apply triton kernel
         xq, scale = self.scale_inputs(x, x.device)
-        if layer.weight.data.shape[0] <= 4:
+        if xq.shape[0] <= 4:
             return triton_rowscaled_mm(
                 A=xq,
                 B=layer.weight,
