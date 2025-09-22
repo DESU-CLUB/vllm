@@ -1163,11 +1163,13 @@ class ModelConfig:
                             "overrides are checked in order of preference.")
                     quant_method = quantization_override
                     self.quantization = quantization_override
+                    print(f"Quantization method: {self.quantization}")
                     break
 
             # Verify quantization configurations.
             if self.quantization is None:
                 self.quantization = quant_method
+                print(f"Quantization method: {self.quantization}")
             elif self.quantization != quant_method:
                 raise ValueError(
                     "Quantization method specified in the model config "

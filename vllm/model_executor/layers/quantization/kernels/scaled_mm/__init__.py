@@ -50,6 +50,8 @@ def choose_scaled_mm_linear_kernel(
         type[ScaledMMLinearKernel]: Chosen kernel.
     """
 
+    print(config)
+
     if compute_capability is None:
         _cc = current_platform.get_device_capability()
         if _cc is not None:
