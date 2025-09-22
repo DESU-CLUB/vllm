@@ -9,7 +9,7 @@ from vllm.model_executor.layers.quantization.base_config import QuantizationConf
 from vllm.model_executor.layers.linear import LinearMethodBase, LinearBase
 from vllm.model_executor.layers.quantization import register_quantization_config
 from vllm.model_executor.parameter import ModelWeightParameter, Parameter, ChannelQuantScaleParameter
-
+from vllm import _custom_ops as ops
 os.environ['TRITON_ALWAYS_COMPILE'] = '1'
 
 class SmallMTRITONConfig(QuantizationConfig):
@@ -152,10 +152,23 @@ class SmallMTRITONLinearMethod(LinearMethodBase):
     ) -> torch.Tensor:
         # Scale input and apply triton kernel
         xq, scale = self.scale_inputs(x, x.device)
-        return triton_rowscaled_mm(
-            A=xq,
-            B=layer.weight,
-            sA=scale,
-            sB=layer.weight_scale,
-        )
+        if layer.weight.data.shape[0] <= 4:
+            return triton_rowscaled_mm(
+                A=xq,
+                B=layer.weight,
+                sA=scale,
+                sB=layer.weight_scale,
+            )
+        else:
+            return ops.cutlass_scaled_mm(
+                a = xq,
+                b = layer.weight,
+                scale_a = scale,
+                scale_b = layer.weight_scale,
+                out_dtype = torch.bfloat16,
+            )
+        
+def register():
+    pass
+    
         
