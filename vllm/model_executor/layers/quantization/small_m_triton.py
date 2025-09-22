@@ -124,7 +124,7 @@ class SmallMTRITONLinearMethod(LinearMethodBase):
         
     def scale_inputs(self, tensor: torch.Tensor, device: torch.device) -> tuple[torch.Tensor, torch.Tensor]:
         # Scale input and apply triton kernel
-        absmax = tensor.abs().amax(dim=-1, keepdim=True)
+        absmax = tensor.abs().amax(dim=-1, keepdim=True).to(torch.float32)
         
         if self.quant_config.weight_dtype == "int8":
             scale = absmax / 127.5  # 127 should be fine too
@@ -140,7 +140,7 @@ class SmallMTRITONLinearMethod(LinearMethodBase):
     def process_weights_after_loading(self, layer: torch.nn.Module) -> None:
         # Scale weights
         layer.weight = Parameter(layer.weight.data.t(), requires_grad=False)
-        layer.weight_scale = Parameter(layer.weight_scale.data.t(), requires_grad=False)
+        layer.weight_scale = Parameter(layer.weight_scale.data.to(torch.float32).t(), requires_grad=False)
         layer.input_scale = None
 
 
