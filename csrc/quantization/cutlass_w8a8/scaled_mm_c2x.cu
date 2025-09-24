@@ -197,3 +197,4 @@ void cutlass_scaled_mm_azp_sm89(torch::Tensor& out, torch::Tensor const& a,
         out, a, b, a_scales, b_scales, azp_adj, bias);
   }
 }
+
