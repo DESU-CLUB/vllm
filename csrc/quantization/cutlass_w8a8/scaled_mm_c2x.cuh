@@ -71,6 +71,17 @@ struct enable_sm89_to_sm90 : Kernel {
 #endif
   }
 };
+
+template <typename Kernel>
+struct enable_sm120_only : Kernel {
+  template <typename... Args>
+  CUTLASS_DEVICE static void invoke(Args&&... args) {
+#if defined __CUDA_ARCH__ && __CUDA_ARCH__ == 1200
+    Kernel::invoke(std::forward<Args>(args)...);
+#endif
+  }
+};
+
 template <typename Arch, template <typename> typename ArchGuard,
           typename ElementAB_, typename ElementD_,
           template <typename, typename> typename Epilogue_, typename TileShape,

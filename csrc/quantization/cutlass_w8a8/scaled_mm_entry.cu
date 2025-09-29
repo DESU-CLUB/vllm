@@ -59,6 +59,14 @@ void cutlass_scaled_mm_sm120(torch::Tensor& c, torch::Tensor const& a,
                              std::optional<torch::Tensor> const& bias);
 #endif
 
+#if defined ENABLE_SCALED_MM_C2X && ENABLE_SCALED_MM_C2X
+void cutlass_scaled_mm_sm120_int8(torch::Tensor& c, torch::Tensor const& a,
+                                  torch::Tensor const& b,
+                                  torch::Tensor const& a_scales,
+                                  torch::Tensor const& b_scales,
+                                  std::optional<torch::Tensor> const& bias);
+#endif
+
 #if defined ENABLE_SCALED_MM_SM100 && ENABLE_SCALED_MM_SM100
 void cutlass_scaled_mm_sm100(torch::Tensor& c, torch::Tensor const& a,
                              torch::Tensor const& b,
@@ -196,6 +204,16 @@ void cutlass_scaled_mm(torch::Tensor& c, torch::Tensor const& a,
 
 #if defined ENABLE_SCALED_MM_SM120 && ENABLE_SCALED_MM_SM120
   if (version_num >= 120) {
+    // If int8 on SM120, forward to SM89 fallback if compiled; otherwise error
+    if (a.dtype() == torch::kInt8) {
+#if defined ENABLE_SCALED_MM_C2X && ENABLE_SCALED_MM_C2X
+      cutlass_scaled_mm_sm120_int8(c, a, b, a_scales, b_scales, bias);
+      return;
+#else
+      TORCH_CHECK(false, "Int8 scaled_mm on SM120 requires C2x fallback (SM89) compiled");
+#endif
+    }
+
     cutlass_scaled_mm_sm120(c, a, b, a_scales, b_scales, bias);
     return;
   }

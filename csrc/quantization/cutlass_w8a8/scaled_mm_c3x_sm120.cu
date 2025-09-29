@@ -15,7 +15,7 @@ void cutlass_scaled_mm_sm120(torch::Tensor& c, torch::Tensor const& a,
                              std::optional<torch::Tensor> const& bias) {
   dispatch_scaled_mm(c, a, b, a_scales, b_scales, bias,
                      vllm::cutlass_scaled_mm_sm120_fp8,
-                     nullptr,  // int8 not supported on SM120
+                     nullptr,  // int8 not supported on SM120; handled in entry fallback
                      vllm::cutlass_scaled_mm_blockwise_sm120_fp8);
 }
 
