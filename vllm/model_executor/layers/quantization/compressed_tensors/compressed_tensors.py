@@ -745,6 +745,8 @@ class CompressedTensorsLinearMethod(LinearMethodBase):
         layer input.  See LinearMethodBase for param details
 
         """
+        print(layer.weight.data)
+        print(layer.weight_scale.data)
         scheme = layer.scheme
         if scheme is None:
             raise ValueError("A scheme must be defined for each layer")

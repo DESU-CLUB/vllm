@@ -35,6 +35,7 @@ QuantizationMethods = Literal[
     "inc",
     "mxfp4",
     "petit_nvfp4",
+    "small_m_triton",
 ]
 QUANTIZATION_METHODS: list[str] = list(get_args(QuantizationMethods))
 
@@ -112,8 +113,10 @@ def get_quantization_config(quantization: str) -> type[QuantizationConfig]:
     from .rtn import RTNConfig
     from .torchao import TorchAOConfig
     from .tpu_int8 import Int8TpuConfig
+    from .small_m_triton import SmallMTRITONConfig
 
     method_to_config: dict[str, type[QuantizationConfig]] = {
+        "small_m_triton": SmallMTRITONConfig,
         "awq": AWQConfig,
         "deepspeedfp": DeepSpeedFPConfig,
         "tpu_int8": Int8TpuConfig,
